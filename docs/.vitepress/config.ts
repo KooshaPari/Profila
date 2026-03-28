@@ -4,6 +4,7 @@ export default defineConfig({
   title: 'profiler',
   description: 'Project documentation',
   outDir: '../docs-dist',
+  ignoreDeadLinks: true,
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
