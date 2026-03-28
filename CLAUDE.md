@@ -481,12 +481,12 @@ When multiple agents or actors share a dev environment:
 
 # Plugin Ecosystem Awareness
 
-Documentation and workflow frameworks (BMAD, AgilePlus, GSD, etc.) may be available as plugins or slash commands.
+Spec work is tracked via AgilePlus: `cd /Users/kooshapari/CodeProjects/Phenotype/repos/AgilePlus && agileplus <command>`
 
 - Check available slash commands (`/`) for documentation workflows
+- AgilePlus is the canonical spec and work-tracking system for all Phenotype projects
 - These complement the auto-detection system -- invoke explicitly for deeper workflows
 - Auto-detection hooks handle common cases; plugins handle advanced scenarios
-- If BMAD agents are installed (`.claude/commands/bmad/`), they can be activated via slash commands for specialized agent personas
 - Start a new conversation to switch agent personas
 
 ---
