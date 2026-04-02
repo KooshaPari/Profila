@@ -1,8 +1,49 @@
 {
-  "name": "Phenotype Dev Container",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "name": "Profila Development Environment",
+  "image": "mcr.microsoft.com/devcontainers/python:3.11",
   "features": {
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/git:1": {},
+    "ghcr.io/devcontainers/features/github-cli:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+    "ghcr.io/devcontainers/features/common-utils:2": {
+      "installZsh": true,
+      "configureZshAsDefaultShell": true,
+      "installOhMyZsh": true,
+      "upgradePackages": true
+    }
   },
-  "postCreateCommand": "pre-commit install"
+  "postCreateCommand": "pip install -e '.[dev]' && pre-commit install",
+  "postStartCommand": "git config --global --add safe.directory /workspaces/profila",
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+        "ms-python.black-formatter",
+        "charliermarsh.ruff",
+        "redhat.vscode-yaml",
+        "github.copilot",
+        "github.copilot-chat",
+        "eamodio.gitlens",
+        "yzhang.markdown-all-in-one"
+      ],
+      "settings": {
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
+        "python.linting.enabled": true,
+        "python.linting.ruffEnabled": true,
+        "python.formatting.provider": "ruff",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+          "source.fixAll": true,
+          "source.organizeImports": true
+        }
+      }
+    }
+  },
+  "forwardPorts": [],
+  "mounts": [],
+  "remoteUser": "vscode",
+  "containerEnv": {
+    "PROFILA_ENV": "development"
+  }
 }
