@@ -1,63 +1,133 @@
-# Functional Requirements — profiler
+# Functional Requirements - Profila
 
-**Total FRs:** 18
-**Implementation Status:** IN PROGRESS
-**Last Updated:** 2026-03-26
+**Version:** 1.0.0  
+**Status:** Active  
+**Last Updated:** 2026-04-02
 
-Traces to: `PRD.md` epics E1-E5.
+## Overview
 
----
-
-## FR-MET: System Metrics Collection
-
-- **FR-MET-001:** The system SHALL accept a process name as the primary target argument and resolve it to a PID via `pgrep`. Traces to: E1.1.
-- **FR-MET-002:** The system SHALL exit with a non-zero status code and print an error message to stderr when the target process is not found. Traces to: E1.1.
-- **FR-MET-003:** The quick metrics command SHALL report RSS (MB), VMS (MB), CPU%, thread count, and open file-descriptor count. Traces to: E1.1.
-- **FR-MET-004:** The full metrics command SHALL include memory-map detail (`/proc/<pid>/smaps` on Linux, `vmmap` on macOS) and kernel CPU scheduling stats. Traces to: E1.2.
-- **FR-MET-005:** All metric report files SHALL be written to the configured output directory with filename pattern `<type>_<YYYYMMDD_HHMMSS>.txt`. Traces to: E1.1, E1.2, E1.3, E1.4.
+Profila is a comprehensive profiling and analysis toolkit for software engineering workflows. This document defines the functional requirements with traceability IDs (FR-PROF-NNN) for test coverage.
 
 ---
 
-## FR-NET: Network Profiling
+## Core Profiling Modules
 
-- **FR-NET-001:** The network profiler SHALL list all open TCP and UDP connections for the target PID. Traces to: E1.3.
-- **FR-NET-002:** The network profiler SHALL report per-network-interface byte counters (RX/TX). Traces to: E1.3.
+### FR-PROF-001: Space/Time Complexity Analysis
 
----
+**Priority:** High  
+**Status:** Implemented
 
-## FR-DSK: Disk Profiling
+The complexity analyzer shall:
 
-- **FR-DSK-001:** The disk profiler SHALL report read and write throughput (MB/s) for the target PID over a one-second sampling window. Traces to: E1.4.
-- **FR-DSK-002:** The disk profiler SHALL report the count of open file handles for the target PID. Traces to: E1.4.
+1. **AST Parsing** - Parse Python source files to extract function definitions
+2. **Complexity Metrics** - Calculate cyclomatic and cognitive complexity
+3. **Reporting** - Generate JSON/CSV reports with complexity scores
+4. **Threshold Alerts** - Flag functions exceeding configured limits
+5. **Visualization** - Export data for chart generation
 
----
-
-## FR-AUD: System Audit
-
-- **FR-AUD-001:** The `audit` command SHALL invoke `all_metrics.sh`, `network_profiler.sh`, and `disk_profiler.sh` in sequence and produce a single consolidated report file. Traces to: E1.5.
-- **FR-AUD-002:** The `all` command SHALL invoke network and disk profilers in addition to the full metrics script and print a completion message to stdout. Traces to: E1.5.
-
----
-
-## FR-CPX: Code Complexity Analysis
-
-- **FR-CPX-001:** The complexity analyzer SHALL parse Python source files using the `ast` module and compute per-function cyclomatic complexity. Traces to: E2.1.
-- **FR-CPX-002:** The complexity analyzer SHALL flag any function whose cyclomatic complexity exceeds 10 or whose loop/conditional nesting implies cognitive complexity exceeding 15 as `[HIGH]`. Traces to: E2.1.
-- **FR-CPX-003:** The complexity analyzer SHALL exit with status code 1 if any `[HIGH]` function is found; exit 0 otherwise. Traces to: E2.1.
-- **FR-CPX-004:** The complexity analyzer SHALL accept a `--lang` flag supporting `python`, `rust`, `go`, and `typescript`, applying regex heuristics for non-Python languages. Traces to: E2.2.
+**Test Traceability:**
+- `tests/unit/test_complexity_analyzer.py`
 
 ---
 
-## FR-CNT: Continuous Monitoring
+### FR-PROF-002: Continuous Profiler
 
-- **FR-CNT-001:** The continuous profiler SHALL write a CSV with header row `timestamp,pid,rss_mb,vms_mb,cpu_pct,threads,fds` to `reports/continuous_<target>_<timestamp>.csv`. Traces to: E3.1.
-- **FR-CNT-002:** The continuous profiler SHALL append one data row every 5 seconds (default; configurable) until SIGINT is received. Traces to: E3.1.
-- **FR-CNT-003:** Upon SIGINT the continuous profiler SHALL flush the output file and exit cleanly without raising an unhandled exception. Traces to: E3.1.
+**Priority:** High  
+**Status:** Implemented
+
+The continuous profiler shall:
+
+1. **Sampling** - Collect CPU and memory samples at configurable intervals
+2. **Low Overhead** - Maintain <5% performance impact during profiling
+3. **Real-time Output** - Stream metrics to stdout or file
+4. **Duration Control** - Support time-boxed profiling sessions
 
 ---
 
-## FR-CHT: Chart Generation
+### FR-PROF-003: System Metrics Collection
 
-- **FR-CHT-001:** The chart generator SHALL accept one or more CSV file paths (glob-expanded by the shell) and produce one PNG per input file. Traces to: E4.1.
-- **FR-CHT-002:** Each chart SHALL contain separate line series for RSS (MB), CPU%, and thread count over the timestamp axis. Traces to: E4.1.
-- **FR-CHT-003:** The chart generator SHALL depend only on `matplotlib` from the standard scientific Python stack and SHALL NOT require additional third-party libraries. Traces to: E4.1.
+**Priority:** High  
+**Status:** Implemented
+
+The system metrics collector shall:
+
+1. **CPU Metrics** - Percent utilization, user/system/idle time breakdown
+2. **Memory Metrics** - Total/available/used memory, swap utilization
+3. **Disk Metrics** - Usage per mounted filesystem, I/O statistics
+4. **Network Metrics** - Interface statistics, connection states
+5. **Export Formats** - Support JSON, CSV, and Prometheus format
+
+**Test Traceability:**
+- `tests/unit/test_system_metrics.py`
+
+---
+
+### FR-PROF-004: Chart Generation
+
+**Priority:** Medium  
+**Status:** Implemented
+
+The chart generator shall:
+
+1. **Input Parsing** - Read JSON metrics data from profilers
+2. **Visualization Types** - Generate time-series, bar, heatmap, pie charts
+3. **Output Formats** - Export as PNG, SVG, or HTML
+
+---
+
+## Integration Requirements
+
+### FR-PROF-101: Profiler Pipeline Integration
+
+**Priority:** High  
+**Status:** Implemented
+
+The profiler pipeline shall:
+
+1. **Sequential Execution** - Run analyzers in dependency order
+2. **Data Passing** - Pass output from one stage to next
+3. **Error Handling** - Continue pipeline on non-fatal errors
+4. **Aggregation** - Combine outputs from multiple profilers
+
+**Test Traceability:**
+- `tests/integration/test_profiler_pipeline.py`
+
+---
+
+## End-to-End Requirements
+
+### FR-PROF-201: Full Profiler Run
+
+**Priority:** High  
+**Status:** Implemented
+
+The complete profiler run shall:
+
+1. **End-to-End Execution** - Run all profilers in sequence
+2. **Data Consistency** - Ensure all outputs use consistent timestamps
+3. **Resource Cleanup** - Remove temporary files after completion
+4. **Exit Codes** - Return appropriate exit codes
+5. **Progress Reporting** - Display progress indicators
+
+**Test Traceability:**
+- `tests/e2e/test_full_profiler_run.py`
+
+---
+
+## Traceability Matrix
+
+| Requirement | Unit Tests | Integration Tests | E2E Tests |
+|-------------|------------|-------------------|-----------|
+| FR-PROF-001 | ✓ | - | - |
+| FR-PROF-002 | - | - | ✓ |
+| FR-PROF-003 | ✓ | - | - |
+| FR-PROF-101 | - | ✓ | - |
+| FR-PROF-201 | - | - | ✓ |
+
+---
+
+## Version History
+
+| Version | Date | Changes | Author |
+|---------|------|---------|--------|
+| 1.0.0 | 2026-04-02 | Initial requirements | Phenotype Engineering |

@@ -1,0 +1,53 @@
+name: Issue Labeler
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+      contents: read
+    
+    steps:
+      - name: Label based on content
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const issue = context.payload.issue;
+            const title = issue.title.toLowerCase();
+            const body = issue.body?.toLowerCase() || '';
+            const content = title + ' ' + body;
+            
+            const labelsToAdd = [];
+            
+            if (content.includes('bug') || content.includes('error') || content.includes('crash')) {
+              labelsToAdd.push('bug');
+            }
+            
+            if (content.includes('feature') || content.includes('enhancement') || content.includes('add')) {
+              labelsToAdd.push('enhancement');
+            }
+            
+            if (content.includes('doc') || content.includes('readme') || content.includes('guide')) {
+              labelsToAdd.push('documentation');
+            }
+            
+            if (content.includes('performance') || content.includes('slow') || content.includes('memory')) {
+              labelsToAdd.push('performance');
+            }
+            
+            if (content.includes('security') || content.includes('vulnerability')) {
+              labelsToAdd.push('security');
+            }
+            
+            if (labelsToAdd.length > 0) {
+              github.rest.issues.addLabels({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                labels: labelsToAdd
+              });
+            }

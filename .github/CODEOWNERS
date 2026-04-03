@@ -1,1 +1,34 @@
+# Global fallback
 * @Phenotype-Enterprise/engineering-leads
+
+# Security-sensitive files
+.github/workflows/security.yml @Phenotype-Enterprise/security-team
+gitleaks.toml @Phenotype-Enterprise/security-team
+SECURITY.md @Phenotype-Enterprise/security-team
+
+# CI/CD workflows
+.github/workflows/*.yml @Phenotype-Enterprise/platform-team
+
+# Documentation
+*.md @Phenotype-Enterprise/tech-writers
+docs/ @Phenotype-Enterprise/tech-writers
+
+# Core profiling logic
+bin/complexity_analyzer.py @Phenotype-Enterprise/profiling-experts
+bin/continuous_profiler.py @Phenotype-Enterprise/profiling-experts
+bin/system_metrics.py @Phenotype-Enterprise/profiling-experts
+bin/generate_charts.py @Phenotype-Enterprise/profiling-experts
+
+# Test infrastructure
+tests/ @Phenotype-Enterprise/qa-team
+.pytest.ini @Phenotype-Enterprise/qa-team
+conftest.py @Phenotype-Enterprise/qa-team
+
+# Configuration files
+pyproject.toml @Phenotype-Enterprise/platform-team
+Taskfile.yml @Phenotype-Enterprise/platform-team
+mise.toml @Phenotype-Enterprise/platform-team
+
+# Dev environment
+.devcontainer/ @Phenotype-Enterprise/platform-team
+.env.example @Phenotype-Enterprise/platform-team

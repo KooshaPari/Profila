@@ -1,0 +1,76 @@
+# Docker Compose for Profila Development Environment
+# Provides optional services for local development and testing
+
+version: '3.8'
+
+services:
+  # Redis for caching profiler results during development
+  redis:
+    image: redis:7-alpine
+    container_name: profila-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Prometheus for metrics storage (optional)
+  prometheus:
+    image: prom/prometheus:v2.48.0
+    container_name: profila-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    profiles:
+      - monitoring
+
+  # Grafana for visualization (optional)
+  grafana:
+    image: grafana/grafana:10.2.0
+    container_name: profila-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+    profiles:
+      - monitoring
+    depends_on:
+      - prometheus
+
+  # Test database for integration tests
+  postgres:
+    image: postgres:16-alpine
+    container_name: profila-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: profila
+      POSTGRES_PASSWORD: profila
+      POSTGRES_DB: profila_test
+    profiles:
+      - test
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U profila"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  redis_data:
+  prometheus_data:
+  grafana_data:
+  postgres_data:
+
+# Usage:
+#   docker-compose up -d redis              # Start Redis only
+#   docker-compose --profile monitoring up  # Start with Prometheus/Grafana
+#   docker-compose --profile test up       # Start with test database
